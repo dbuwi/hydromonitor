@@ -195,7 +195,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
  
   // CONVERT MESSAGE TO JSON
-  StaticJsonDocument<1000> doc;
+  JsonDocument doc;
   DeserializationError error = deserializeJson(doc, received);  
 
   if (error) {
