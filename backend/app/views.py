@@ -37,7 +37,6 @@ def get_all(start,end):
    
 
 
-
 @app.route('/api/mmar/temperature/<start>/<end>', methods=['GET']) 
 def get_temperature_mmar(start,end):   
     '''RETURNS MIN, MAX, AVG AND RANGE FOR TEMPERATURE. THAT FALLS WITHIN THE START AND END DATE RANGE'''
