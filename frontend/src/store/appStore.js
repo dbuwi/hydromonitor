@@ -11,8 +11,7 @@ export const useAppStore =  defineStore('app', ()=>{
     function() s become actions  
     */ 
 
-    // STATES 
-  
+    // STATES   
 
 
     // ACTIONS
