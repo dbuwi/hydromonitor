@@ -17,7 +17,8 @@ from os import getcwd
 from os.path import join, exists
 from time import time, ctime
 from math import floor
- 
+from backend.app.functions import DB
+from backend.app.config import Config 
 
 
 
@@ -30,8 +31,12 @@ def get_all(start,end):
     '''RETURNS ALL THE DATA FROM THE DATABASE THAT EXIST IN BETWEEN THE START AND END TIMESTAMPS'''
    
     if request.method == "GET":
-        '''Add your code here to complete this route'''
-
+       try:
+           # Converts 'start' and 'end' timestamps to datetime objects
+            start_date = datetime.fromtimestamp(float(start), timezone.utc)
+            end_date = datetime.fromtimestamp(float(end), timezone.utc)
+            db =DB(Config)
+            result = db.getAllInRange(start_date, end_date)
     # FILE DATA NOT EXIST
     return jsonify({"status":"not found","data":[]})
    
@@ -43,7 +48,17 @@ def get_temperature_mmar(start,end):
    
     if request.method == "GET": 
         '''Add your code here to complete this route'''
+         try:
+            strt = escape(start)
+            end  = escape(end)
+            temp = mongo.temperatureMMAR(strt,end)
+            if temp:
+                return jsonify({"status":"found","data": temp})
+            
+        except Exception as e:
+            print(f"get_onCountPost error: f{str(e)}")        
 
+   
     # FILE DATA NOT EXIST
     return jsonify({"status":"not found","data":[]})
 
@@ -57,10 +72,16 @@ def get_humidity_mmar(start,end):
    
     if request.method == "GET": 
         '''Add your code here to complete this route'''
-
+         try:
+            hum = humidityMMAR(strt,end)
+            if hum:
+                return jsonify({"status": "success", "data": hum})
     # FILE DATA NOT EXIST
     return jsonify({"status":"not found","data":[]})
-
+    
+    except Exception as e:
+            # Handle any exceptions and return an error response
+            return jsonify({"status": "error", "message": str(e)})
 
 
 
@@ -71,10 +92,14 @@ def get_freq_distro(variable,start,end):
    
     if request.method == "GET": 
         '''Add your code here to complete this route'''         
-
+         try:
+            result = frequencyDistro(variable, start, end)
+            if result:
+                return jsonify({"status": "success", "data": result})
     # FILE DATA NOT EXIST
     return jsonify({"status":"not found","data":[]})
-
+        except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
 
 
 @app.route('/api/file/get/<filename>', methods=['GET']) 
