@@ -5,14 +5,14 @@
                 <v-sheet class="pa-2" height="250">
                     <p>Enter date range for Analysis</p>
                     <v-divider></v-divider>
-                    <v-text-field label="Start date" type="date" density="compact" variant="solo-inverted" flat
+                    <v-text-field v-model= "start" label="Start date" type="date" density="compact" variant="solo-inverted" flat
                         style="max-width: 300px; margin-right: 5px;">
                     </v-text-field>
-                    <v-text-field label="End date" type="date" density="compact" variant="solo-inverted" flat
+                    <v-text-field v-model = "end" label="End date" type="date" density="compact" variant="solo-inverted" flat
                         style="max-width: 300px;">
                     </v-text-field>
                     <v-spacer></v-spacer>
-                    <v-btn @click="updateLineCharts(); updateCards()", class="text-caption" color="primary" variant="tonal">Analyze</v-btn>
+                    <v-btn @click="updateCards();updateLineCharts();updateHistogramCharts()" class="text-caption" color="primary" variant="tonal">Analyze</v-btn>
                 </v-sheet>
             </v-col>
             <v-col cols="3" class="d-flex justify-center">
@@ -98,7 +98,7 @@
             </v-col>
             <v-col cols="12" >
                 <figure class="highcharts-figure">
-                   <div id="container"></div>
+                   <div id="container4"></div>
                 </figure>
             </v-col>
 
@@ -168,7 +168,7 @@ type: 'spline',
 data: [],
 turboThreshold: 0,
 color: Highcharts.getOptions().colors[1]
-} ],
+} ]
 });
 
 // HUMIDITY CHART
@@ -199,7 +199,7 @@ type: 'spline',
 data: [],
 turboThreshold: 0,
 color: Highcharts.getOptions().colors[1]
-} ],
+} ]
 });
 
 // Frequency Disctribution CHART
@@ -229,7 +229,7 @@ type: 'spline',
 data: [],
 turboThreshold: 0,
 color: Highcharts.getOptions().colors[1]
-} ],
+} ]
 });
 
 // SCATTER PLOT
@@ -253,8 +253,8 @@ type: 'scatter',
 data: scatterPlot,
 turboThreshold: 0,
 color: Highcharts.getOptions().colors[0]
-},
- ],
+}
+ ]
 }); 
 
 // SCATTER PLOT for Humidity and Heat Index
@@ -279,34 +279,13 @@ type: 'scatter',
 data: scatterPlot,
 turboThreshold: 0,
 color: Highcharts.getOptions().colors[0]
-},
- ],
-});
-
-const updateCards = async () => {
-// Retrieve Min, Max, Avg, Spread/Range
-if(!!start.value && !!end.value){
-// 1. Convert start and end dates collected fron TextFields to 10 digit timestamps
-let startDate = new Date(start.value).getTime() / 1000;
-let endDate = new Date(end.value).getTime() / 1000;
-// 2. Fetch data from backend by calling the API functions
-const temp = await AppStore.getTemperatureMMAR(startDate,endDate);
-const humid = await AppStore.getHumidityMMAR(startDate,endDate);
-console.log(humid)
-temperature.max = temp[0].max.toFixed(1);
-//3. complete for min, avg and range
-temperature.max = temp[0].max.toFixed(1);
-temperature.min = temp[0].min.toFixed(1);
-temperature.avg = temp[0].avg.toFixed(1);
-temperature.range = (temp[0].max - temp[0].min).toFixed(1);
-//4. complete max, min, avg and range for the humidity variable
-humidity.max = humid[0].max.toFixed(1);
-humidity.min = humid[0].min.toFixed(1);
-humidity.avg = humid[0].avg.toFixed(1);
-humidity.range = (humid[0].max - humid[0].min).toFixed(1);
-} 
 }
-};
+ ]
+});
+ 
+
+
+}; 
 
 
 // FUNCTIONS
@@ -326,7 +305,7 @@ onBeforeUnmount(()=>{
 // unsubscribe from all topics
  Mqtt.unsubcribeAll();
 });
-
+ 
 const updateLineCharts = async ()=>{
 if(!!start.value && !!end.value){
 // Convert output from Textfield components to 10 digit timestamps
@@ -357,6 +336,31 @@ fdChart.value.series[0].setData(frequency);
 scatterPlot.value.series[0].setData(scatter);
 }
 };
+ 
+const updateCards = async () => {
+console.log("called1");
+// Retrieve Min, Max, Avg, Spread/Range
+if(!!start.value && !!end.value){
+// 1. Convert start and end dates collected fron TextFields to 10 digit timestamps
+let startDate = new Date(start.value).getTime() / 1000;
+let endDate = new Date(end.value).getTime() / 1000;
+// 2. Fetch data from backend by calling the API functions
+const temp = await AppStore.getTemperatureMMAR(startDate,endDate);
+const humid = await AppStore.getHumidityMMAR(startDate,endDate);
+console.log(humid);
+console.log(temp);
+temperature.max = temp[0].max.toFixed(1);
+//3. complete for min, avg and range
+temperature.min = temp[0].min.toFixed(1);
+temperature.avg = temp[0].avg.toFixed(1);
+temperature.range = (temp[0].max - temp[0].min).toFixed(1);
+//4. complete max, min, avg and range for the humidity variable
+humidity.max = humid[0].max.toFixed(1);
+humidity.min = humid[0].min.toFixed(1);
+humidity.avg = humid[0].avg.toFixed(1);
+humidity.range = (humid[0].max - humid[0].min).toFixed(1);
+} 
+} 
 
 const updateHistogramCharts = async () =>{
 // Retrieve Min, Max, Avg, Spread/Range for Column graph
@@ -375,7 +379,7 @@ const hi = await AppStore.getFreqDistro("heatindex",startDate,endDate);
 // see example below
 let temperature = [];
 let humidity = [];
-let heatindex = [];
+let heatIndex = [];
 
 // 4. Iterate through the temp variable, which contains temperature data fetched from the backend
 // transform the data to {"x": x_value,"y": y_value} format and then push it to the temperature array created previously
@@ -393,19 +397,19 @@ humid.forEach(row => {
 
 // 6. Iterate through the humid variable, which contains heat index data fetched from the backend
 // transform the data to {"x": x_value,"y": y_value} format and then push it to the heatindex array created previously
-humid.forEach(row => {
+hi.forEach(row => {
       heatindex.push({ "x": row["_id"], "y": row["count"] });
     });
 // 7. update series[0] for the histogram/Column chart with temperature data
 // see example below
-histogramChart.value.series[0].setData(temperature);
+fdChart.value.series[0].setData(temperature);
 
 // 8. update series[1] for the histogram/Column chart with humidity data
-histogramChart.value.series[1].setData(humidity);
+fdChart.value.series[1].setData(humidity);
 // 9. update series[2] for the histogram/Column chart with heat index data
-histogramChart.value.series[2].setData(heatindex);
+fdChart.value.series[2].setData(heatIndex);
 }
-};
+}; 
 </script>
 
 

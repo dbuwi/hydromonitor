@@ -47,44 +47,103 @@ export const useAppStore =  defineStore('app', ()=>{
         }
          
         // New API functions added
-    const getTemperatureMMAR = async (start, end) => {
-        const URL = `/api/mmar/temperature/${start}/${end}`;
-        try {
-            const response = await fetch(URL, { method: 'GET' });
-            if (response.ok) {
-                return await response.json();
+        const getTemperatureMMAR = async (start,end)=>{
+            console.log("called2");
+            // FETCH REQUEST WILL TIMEOUT AFTER 20 SECONDS
+            const controller = new AbortController();
+            const signal = controller.signal;
+            const id = setTimeout(()=>{controller.abort()},60000);
+            const URL = `/api/mmar/temperature/${start}/${end}`;
+            try {
+                const response = await fetch(URL,{ method: 'GET', signal: signal });
+                if (response.ok){
+                    const data = await response.json();
+                    let keys = Object.keys(data);
+                    if(keys.includes("status")){
+                        if(data["status"] == "found" ){
+                            // console.log(data["data"] )
+                            return data["data"];
+                        }
+                        if(data["status"] == "failed"){
+                            console.log("getTemperatureMMAR returned no data");
+                        }
+                    }
+                }
+                else{
+                    const data = await response.text();
+                    console.log(data);
+                }
             }
-        } catch (err) {
-            console.error('getTemperatureMMAR error: ', err.message);
-        }
-        return [];
-    };
+            catch(err){
+                console.error('getTemperatureMMAR error: ', err.message);
+            }
+            return []
+            }
 
-    const getHumidityMMAR = async (start, end) => {
-        const URL = `/api/mmar/humidity/${start}/${end}`;
-        try {
-            const response = await fetch(URL, { method: 'GET' });
-            if (response.ok) {
-                return await response.json();
-            }
-        } catch (err) {
-            console.error('getHumidityMMAR error: ', err.message);
-        }
-        return [];
-    };
 
-    const getFreqDistro = async (variable, start, end) => {
-        const URL = `/api/frequency/${variable}/${start}/${end}`;
-        try {
-            const response = await fetch(URL, { method: 'GET' });
-            if (response.ok) {
-                return await response.json();
+        const getHumidityMMAR = async (start,end)=>{
+            // FETCH REQUEST WILL TIMEOUT AFTER 20 SECONDS
+            const controller = new AbortController();
+            const signal = controller.signal;
+            const id = setTimeout(()=>{controller.abort()},60000);
+            const URL = '/api/mmar/humidity/${start}/${end}';
+            try {
+                const response = await fetch(URL,{ method: 'GET', signal: signal });
+                if (response.ok){
+                    const data = await response.json();
+                    let keys = Object.keys(data);
+                    if(keys.includes("status")){
+                        if(data["status"] == "found" ){
+                            // console.log(data["data"] )
+                            return data["data"];
+                        }
+                        if(data["status"] == "failed"){
+                            console.log("getHumidityMMAR returned no data");
+                        }
+                    }
+                }
+                else{
+                    const data = await response.text();
+                    console.log(data);
+                }
             }
-        } catch (err) {
-            console.error('getFreqDistro error: ', err.message);
+            catch(err){
+                console.error('getHumidityMMAR error: ', err.message);
+            }
+            return []
         }
-        return [];
-    };
+
+        const getFreqDistro = async (variable,start,end)=>{
+            // FETCH REQUEST WILL TIMEOUT AFTER 20 SECONDS
+            const controller = new AbortController();
+            const signal = controller.signal;
+            const id = setTimeout(()=>{controller.abort()},60000);
+            const URL = '/api/frequency/${variable}/${start}/${end}';
+            try {
+                const response = await fetch(URL,{ method: 'GET', signal: signal });
+                if (response.ok){
+                    const data = await response.json();
+                    let keys = Object.keys(data);
+                    if(keys.includes("status")){
+                        if(data["status"] == "found" ){
+                            // console.log(data["data"] )
+                            return data["data"];
+                        }
+                        if(data["status"] == "failed"){
+                            console.log("getFreqDistro returned no data");
+                        }
+                    }
+                }
+                else{
+                    const data = await response.text();
+                    console.log(data);
+                }
+            }
+            catch(err){
+                console.error('getFreqDistro error: ', err.message);
+            }
+            return []
+        }
 
     return { 
     // EXPORTS
