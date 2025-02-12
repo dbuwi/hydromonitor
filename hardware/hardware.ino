@@ -15,7 +15,7 @@
 #include <DHT.h>          // Library for DHT sensor
 
 #include <WiFi.h>         // Library for WiFi connectivity
-#include <NTPClient.h>    // Library for Network Time Protocol (NTP)
+//#include <NTPClient.h>    // Library for Network Time Protocol (NTP)
 #include <WiFiUdp.h>      // Required for NTPClient
 
 #ifndef _WIFI_H 
@@ -42,17 +42,17 @@
 
 // DEFINE VARIABLES
 #define ARDUINOJSON_USE_DOUBLE      1 
-#define LED_PIN 5  
+#define LED_PIN 4
 #define NUM_LEDS 7 
 
 // DEFINE THE CONTROL PINS FOR THE DHT22 
-#define DHT_PIN 4       
+#define DHT_PIN 5       
 #define DHT_TYPE DHT22  
 
 // MQTT CLIENT CONFIG  
 static const char* pubtopic      = "620162321";                    // Add your ID number here
 static const char* subtopic[]    = {"620162321_sub","/elet2415"};  // Array of Topics(Strings) to subscribe to
-static const char* mqtt_server   = "www.yanacreations.com";         // Broker IP address or Domain name as a String 
+static const char* mqtt_server   = "broker.emqx.io";         // Broker IP address or Domain name as a String 
 static uint16_t mqtt_port        = 1883;
 
 // WIFI CREDENTIALS
@@ -126,6 +126,22 @@ void setup() {
   
 void loop() {
     // put your main code here, to run repeatedly:       
+    // PRINT SENSOR VALUES TO SERIAL MONITOR
+  float Temp = dht.readTemperature();
+  float Humid = dht.readHumidity();
+  float HeatIndex = dht.computeHeatIndex(Temp, Humid, false);
+   
+  // PRINT SENSOR VALUES TO SERIAL MONITOR
+  Serial.print("Temperature: ");
+  Serial.print(Temp);
+  Serial.print(" °C, Humidity: ");
+  Serial.print(Humid);
+  Serial.println(" %");
+  Serial.print(HeatIndex);
+  Serial.println(" °C");
+
+
+  delay(2000); 
     vTaskDelay(1000 / portTICK_PERIOD_MS);    
 }
 

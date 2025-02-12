@@ -2,6 +2,42 @@
    
         <!-- HTML HERE -->    
         <!--<h2>New Template</h2>-->
+        
+        <v-container class="d-flex flex-column align-center">
+     <!-- Brightness Slider -->
+    <v-slider
+      v-model="led.brightness"
+      min="0"
+      max="255"
+      step="1"
+      label="Brightness"
+      thumb-label
+      color="secondary"
+    ></v-slider>
+     <!-- LED Count Slider -->
+     <v-slider
+      v-model="led.leds"
+      min="1"
+      max="7"
+      step="1"
+      label="Active LEDs"
+      thumb-label
+      color="primary"
+    ></v-slider>
+     <!-- LED Indicator -->
+     <v-progress-circular
+      :size="200"
+      :width="15"
+      :rotate="0"
+      :value="led.leds * 15"
+      :color="indicatorColor"
+    >
+      <span class="text-onSurface font-weight-bold">
+        {{ led.leds }} LED(s)
+      </span>
+    </v-progress-circular>
+  </v-container>
+
     <v-container fluid class="d-flex justify-center align-center">
       <v-row class="ma-0" style="max-width: 1200px;">
          <!-- First Column -->
@@ -109,12 +145,14 @@ onBeforeUnmount(()=>{
 // WATCHERS
 watch(led,(controls)=>{
 clearTimeout(ID);
+
 ID = setTimeout(()=>{
 const message = JSON.stringify({"type":"controls","brightness":controls.brightness,"leds":controls.leds,"color":
 controls.color});
 Mqtt.publish("620162321_sub",message); // Publish to a topic subscribed to by the hardware
 },1000)
 })
+  
 
 </script>
 
